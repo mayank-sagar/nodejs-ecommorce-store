@@ -1,0 +1,22 @@
+extends layout/main-layout.pug
+
+block styles
+        link(rel="stylesheet", href="/css/product.css")
+
+block content
+    if prods.length > 0
+        .grid
+            each product in prods
+                article.card.product-item
+                    header.card__header
+                        h1.product__title #{product.title}
+                    .card__image
+                        img(src="https://www.fujifilm.com/products/digital_cameras/x/fujifilm_x_t3/sample_images/img/index/ff_x_t3_002.JPG" alt="A Book")
+                    .card__content
+                        h2.product__price $19.99
+                        p.product__description A very interesting book about so many even more interesting things!</p>
+                    .card__actions
+                        button.btn Add to Cart
+    else
+        h1 No Products
+                        

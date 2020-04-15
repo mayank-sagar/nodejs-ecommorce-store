@@ -36,20 +36,31 @@ exports.getEditProduct = (req,res,next) => {
     const imageUrl = req.body.imageUrl;
     const price = req.body.price;
     const description = req.body.description;
-    const product = new Product(null,title,imageUrl,price,description); 
-    product.save();
-        res.redirect('/');
+    
+        Product.create({
+        title:title,
+        imageUrl:imageUrl,
+        price:price,
+        description:description
+    })
+    .then(result => {
+            res.redirect('/');
+            console.log(result);        
+    })
+    .catch(err => {
+        console.log(err);
+    });
 };
 
 
 exports.getProducts = (req,res,next) => {
-    Product.fetchAll(products => {
-        return res.render('admin/products',{
-            prods:products,
-            docTitle:'Admin Products',
-            path:'/admin/products'
+    Product.findAll().then(products => {
+         return res.render('admin/products',{
+                prods:products,
+                docTitle:'Admin Products',
+                path:'/admin/products'
         });
-    });
+    }).catch(err => console.log(err));
 };
 
 exports.postEditProduct = (req,res,next) => {

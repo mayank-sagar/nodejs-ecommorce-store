@@ -18,4 +18,6 @@ const shopController = require('../controllers/shop');
 
     router.post('/cart-delete-item',shopController.postCartDeleteProducts);
 
+    router.post('/create-order',shopController.postOrder);
+
 module.exports = router;

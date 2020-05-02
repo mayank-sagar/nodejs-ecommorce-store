@@ -1,17 +1,29 @@
-// const mysql = require('mysql2');
-// const pool = mysql.createPool({
-//   host:'localhost',
-//   user:'root',
-//   password:'',
-//   database:'ecommerce'
-// });
+const mongoDb = require('mongodb');
+const MongoClient = mongoDb.MongoClient;
+_db = null;
 
-// module.exports = pool.promise();
+const mongoConnect = (callback) => {
+  MongoClient.connect('mongodb+srv://user:password@123@ecommerce-dphpz.mongodb.net/ecommerce?retryWrites=true&w=majority')
+  .then(client => {
+    console.log(client,'Connected!');
+    this._db = client.db();
+    callback();
+  })
+  .catch(err => {
+    console.log('error');
+    throw err;
+  });
+}
 
 
-const Sequelize = require('sequelize');
 
-const sequelize = new Sequelize('ecommerce','root','',{dialect:'mysql','host':'localhost'});
+const getDb = () => {
+if(this._db) {
+  return this._db;
+} else {
+  throw "No Database Found";
+}
+};
 
-module.exports = sequelize;
- 
+exports.mongoConnect = mongoConnect;
+exports.getDb = getDb;

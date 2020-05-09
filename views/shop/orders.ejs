@@ -13,14 +13,22 @@
                             <li>
                                 <h1># <%= order._id %></h1>
                                 <ul>
-                                    <% order.items.forEach(product => { %>
-                                        <li> <%=product.title %> (<%=product.quantity%>) </li>
+                                    <% order.products.forEach(p => { %>
+                                        <li> <%=p.product.title %> (<%=p.quantity%>) </li>
                                     <% }); %>
                                 </ul>
+
+                                <h3>
+                                    total: <%= order.products.reduce((prevPrice,p) => {
+                                        return prevPrice+(p.product.price * p.quantity);
+                                    },0)%>
+                                </h3>
                             </li>
+
                         <% }); %>
 
                     </ul>
+                   
             <% } %>
         </main>
         <%- include('../includes/footer.ejs') %>

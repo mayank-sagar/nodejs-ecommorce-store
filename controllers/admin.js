@@ -41,7 +41,8 @@ exports.getEditProduct = (req,res,next) => {
         title:title,
         price: price,
         description:description,
-        imageUrl: imageUrl
+        imageUrl: imageUrl,
+        userId:req.user
     });
     product.save()
     .then(result => {
@@ -56,8 +57,11 @@ exports.getEditProduct = (req,res,next) => {
 
 exports.getProducts = (req,res,next) => {
     //req.user.getProducts()
-    Product.fetchAll()
+    Product.find()
+    // .select('title price -_id')
+    // .populate('userId','name')
     .then(products => {
+        console.log(products);
          return res.render('admin/products',{
                 prods:products,
                 docTitle:'Admin Products',
@@ -73,8 +77,11 @@ exports.postEditProduct = (req,res,next) => {
     const updatedImageUrl = req.body.imageUrl;
     const updatedDesc = req.body.description;
     Product.findById(id).then((product) => {
-        const updatedProduct = new Product(updatedTitle,updatedPrice,updatedImageUrl,updatedDesc,id,req.user._id);
-        return updatedProduct.save();
+        product.title  = updatedTitle;
+        product.price  = updatedPrice;
+        product.imageUrl = updatedImageUrl;
+        product.description = updatedDesc;
+        return product.save();
     })
     .then((result) => {
         console.log('UPDATE SUCCESSFULLY')
@@ -87,7 +94,7 @@ exports.postEditProduct = (req,res,next) => {
 
 exports.postDeleteProduct = (req,res,next) => {
     const productId = req.body.productId;
-    Product.deleteById(productId)
+    Product.findByIdAndRemove(productId)
     .then(() => {
         console.log("PRODUCT DELETED SUCCESS");
         return res.redirect('/admin/products');

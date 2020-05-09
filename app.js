@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
+const authRoutes = require('./routes/auth');
 const mongoose = require('mongoose');
 const errorController = require('./controllers/errors');
 const path = require('path');
@@ -25,6 +26,7 @@ app.use(express.static(path.join(rootDir,'public')));
 app.use(bodyParser.urlencoded({extended:false}));
 app.use('/admin',adminRoutes);
 app.use(shopRoutes);
+app.use(authRoutes);
  app.use(errorController.get404);
 
 mongoose.connect('mongodb+srv://user:password%40123@ecommerce-dphpz.mongodb.net/ecommerce?retryWrites=true&w=majority',{ 

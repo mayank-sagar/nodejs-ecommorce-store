@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const session = require('express-session');
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 const authRoutes = require('./routes/auth');
@@ -24,6 +25,7 @@ app.use((req,res,next) => {
 
 app.use(express.static(path.join(rootDir,'public')));
 app.use(bodyParser.urlencoded({extended:false}));
+app.use(session({secret:'secret', resave: false, saveUninitialized:false}));
 app.use('/admin',adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);

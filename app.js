@@ -12,12 +12,14 @@ const path = require('path');
 const app = express();
 const rootDir = require('./utils/path');
 const User = require('./models/user');
-
+const csrf = require('csurf');
+const flash = require('connect-flash');
 
 const store  = new MongoDBStore({
   uri:MONGODB_URI,
   collection:'sessions'
 });
+const csrfProtection = csrf();
 // const getDb = require('./utils/database').getDb;
 // const mongoConnect = require('./utils/database').mongoConnect;
 // const User = require('./models/user');
@@ -28,6 +30,8 @@ app.get('/favicon.ico', (req, res) => res.status(204));
 app.use(express.static(path.join(rootDir,'public')));
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(session({secret:'secret', resave: false, saveUninitialized:false,store:store}));
+app.use(csrfProtection);
+app.use(flash());
 app.use((req,res,next) => {
   if(!req.session.user) {
     return next();
@@ -36,6 +40,11 @@ app.use((req,res,next) => {
     req.user = user;
     next(); 
   }).catch(err => console.log(err));
+})
+app.use((req,res,next) => {
+  res.locals.isAuthenticated = req.session.user;
+  res.locals.csrfToken = req.csrfToken();
+  next();
 })
 app.use('/admin',adminRoutes);
 app.use(shopRoutes);

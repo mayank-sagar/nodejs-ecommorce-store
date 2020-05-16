@@ -97,7 +97,7 @@ exports.postOrder = (req,res,next) => {
         });
         order = new Order({
             user: {
-                name:req.user.name,
+                email:req.user.email,
                 userId: req.user
             },
             products:products
@@ -118,7 +118,6 @@ exports.getIndex = (req,res,next) => {
             prods:products,
             docTitle:'Shop | Home ',
             path:'/',
-            isAuthenticated:req.user
         });
         }).catch(err => console.log(err));
 }
@@ -156,7 +155,7 @@ exports.getOrders = (req,res,next) => {
         path:'/orders',
         docTitle:'My Orders',
         orders:orders,
-        isAuthenticated:req.sesion.user
+        isAuthenticated:req.session.user
     })
     }).catch(err => console.log(err));
 };

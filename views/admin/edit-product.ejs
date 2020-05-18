@@ -7,22 +7,66 @@
    <%- include('../includes/navigation.ejs') %>
 
     <main>
+        <% if (errorMessage) { %>
+            <div class="user-message user-message--error"><%= errorMessage %></div>
+         <% } %>
         <form class="product-form" action="/admin/<%= editing?'edit-product':'add-product' %>" method="POST">
             <div class="form-control">
                 <label for="title">Title</label>
-                <input type="text" name="title" id="title" value="<%= editing?product.title:null%>" >
+                <input 
+                class="<%= validationErrors.find(e => e.param === 'title')?'invalid':''%>"
+                type="text" 
+                name="title" 
+                id="title" 
+                value="<%= editing || hasError ?product.title:null%>" >
+                <div class="txt-danger">
+                    <%= validationErrors.find(e => e.param === 'title')?
+                    validationErrors.find(e => e.param === 'title').msg
+                    :'' %>
+                </div>
             </div>
             <div class="form-control">
                 <label for="imageUrl">Image URL</label>
-                <input type="text" name="imageUrl" id="imageUrl" value="<%= editing?product.imageUrl:null%>">
+                <input 
+                class="<%= validationErrors.find(e => e.param === 'imageUrl')?'invalid':''%>"
+                type="text" 
+                name="imageUrl" 
+                id="imageUrl" 
+                value="<%= editing || hasError ?product.imageUrl:null%>">
+                <div class="txt-danger">
+                    <%= validationErrors.find(e => e.param === 'imageUrl')?
+                    validationErrors.find(e => e.param === 'imageUrl').msg
+                    :'' %>
+                </div>
             </div>
             <div class="form-control">
                 <label for="price">Price</label>
-                <input type="number" name="price" id="price" step="0.01" value="<%= editing?product.price:null%>">
+                <input 
+                class="<%= validationErrors.find(e => e.param === 'price')?'invalid':''%>"
+                type="number" 
+                name="price" 
+                id="price" 
+                step="0.01" 
+                value="<%= editing || hasError ?product.price:null%>">
+                <div class="txt-danger">
+                    <%= validationErrors.find(e => e.param === 'price')?
+                    validationErrors.find(e => e.param === 'price').msg
+                    :'' %>
+                </div>
             </div>
             <div class="form-control">
                 <label for="description">Description</label>
-                <textarea name="description" id="description" rows="5"> <%= editing?product.description:null %> </textarea>
+                <textarea 
+                class="<%= validationErrors.find(e => e.param === 'description')?'invalid':''%>"
+                name="description"
+                id="description"
+                rows="5">
+                <%= editing || hasError ?product.description:null %></textarea>
+                <div class="txt-danger">
+                    <%= validationErrors.find(e => e.param === 'description')?
+                    validationErrors.find(e => e.param === 'description').msg
+                    :'' %>
+                </div>
             </div>
 
             <% if(editing)  { %>

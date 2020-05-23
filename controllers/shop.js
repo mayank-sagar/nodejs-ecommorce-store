@@ -11,8 +11,12 @@ exports.getProducts = (req,res,next) => {
             path:'/products',
             isAuthenticated:req.user
         });
-    }).
-    catch(err => console.log(err));
+    })
+     .catch(err => {
+         const error = new Error(err);
+         error.httpStatusCode = 500;
+         return next(error);
+    });
 }
 
 
@@ -26,7 +30,11 @@ exports.getProduct = (req,res,next) => {
             docTitle:product.title+' Details',
             isAuthenticated:req.user
     }) })
-    .catch(err => console.log(err));
+     .catch(err => {
+         const error = new Error(err);
+         error.httpStatusCode = 500;
+         return next(error);
+    });
 }
 
 
@@ -42,7 +50,11 @@ exports.postCart = (req,res,next) => {
         console.log(result);
         res.redirect('/cart');     
     })
-    .catch(err => console.log(err))
+    .catch(err => {
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error);
+   });
     // let fetchedCart;
     // let newQuantity = 1;
     // req.user.getCart().then((cart) => {
@@ -83,7 +95,11 @@ exports.postCartDeleteProducts = (req,res,next) => {
     .then(() => {
         res.redirect('/cart');
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error);
+   });
 };
 
 
@@ -107,9 +123,17 @@ exports.postOrder = (req,res,next) => {
         req.user.clearCart().then( result => {
             return res.redirect('/orders');
         })
-        .catch(err => console.log(err))
+        .catch(err => {
+            const error = new Error(err);
+            error.httpStatusCode = 500;
+            return next(error);
+       });
     })
-    .catch(err => console.log(err))
+     .catch(err => {
+         const error = new Error(err);
+         error.httpStatusCode = 500;
+         return next(error);
+    });
 };
 
 exports.getIndex = (req,res,next) => {
@@ -119,7 +143,11 @@ exports.getIndex = (req,res,next) => {
             docTitle:'Shop | Home ',
             path:'/',
         });
-        }).catch(err => console.log(err));
+        }) .catch(err => {
+         const error = new Error(err);
+         error.httpStatusCode = 500;
+         return next(error);
+    });;
 }
 
 

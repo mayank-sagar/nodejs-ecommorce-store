@@ -37,19 +37,34 @@ app.use((req,res,next) => {
     return next();
   }
   User.findById(req.session.user._id).then((user) => {
+   
+    if(!user) {
+      return next();
+    }
     req.user = user;
     next(); 
-  }).catch(err => console.log(err));
+  }).catch(err => {
+    next(err);
+  });
 })
 app.use((req,res,next) => {
   res.locals.isAuthenticated = req.session.user;
   res.locals.csrfToken = req.csrfToken();
   next();
 })
+app.get('/500',errorController.get500);
 app.use('/admin',adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
- app.use(errorController.get404);
+app.use(errorController.get404);
+
+app.use((error,req,res,next) => {
+ return res.status(500).render('shop/500',{
+  docTitle:'500',
+  path:'500',
+  isAuthenticated:req.user
+})
+});
 
 mongoose.connect(MONGODB_URI,{ 
   useNewUrlParser: true

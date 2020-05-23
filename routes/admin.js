@@ -18,8 +18,6 @@ const {body} = require('express-validator');
         .isAlphanumeric()
         .isLength({min:3})
         ,
-        body('imageUrl')
-        .isURL(),
         body('price')
         .trim()
         .isFloat()

@@ -46,10 +46,11 @@ exports.getEditProduct = (req,res,next) => {
 
  exports.postAddProduct = (req,res,next) => {
     const title = req.body.title;
-    const imageUrl = req.body.imageUrl;
+    const imageUrl = req.file;
     const price = req.body.price;
     const description = req.body.description;
     const errors = validationResult(req);
+    console.log(imageUrl);
     if(!errors.isEmpty()) {
        return res.status(422).render('admin/edit-product',
         {

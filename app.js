@@ -14,11 +14,27 @@ const rootDir = require('./utils/path');
 const User = require('./models/user');
 const csrf = require('csurf');
 const flash = require('connect-flash');
-
+const multer = require('multer');
 const store  = new MongoDBStore({
   uri:MONGODB_URI,
   collection:'sessions'
 });
+const fileStorage = multer.diskStorage({
+  destination:(req,file,cb) => {
+    cb(null,'images');
+  },
+  filename: (req,file,cb) => {
+    cb(null,Math.random()+'-'+file.originalname);
+  }
+})
+
+const fileFilter = (req,file,cb) => {
+if(file.mimetype == 'image/png' || file.mimetype == 'image/jpg' || file.mimetype == 'image/jpeg') {
+  return cb(null,true);
+}
+cb(null,false);
+};
+
 const csrfProtection = csrf();
 // const getDb = require('./utils/database').getDb;
 // const mongoConnect = require('./utils/database').mongoConnect;
@@ -29,6 +45,7 @@ app.get('/favicon.ico', (req, res) => res.status(204));
 
 app.use(express.static(path.join(rootDir,'public')));
 app.use(bodyParser.urlencoded({extended:false}));
+app.use(multer({storage:fileStorage,fileFilter:fileFilter}).single('image'));
 app.use(session({secret:'secret', resave: false, saveUninitialized:false,store:store}));
 app.use(csrfProtection);
 app.use(flash());

@@ -44,6 +44,7 @@ app.set('views','views');
 app.get('/favicon.ico', (req, res) => res.status(204));
 
 app.use(express.static(path.join(rootDir,'public')));
+app.use('/images',express.static(path.join(rootDir,'images')));
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(multer({storage:fileStorage,fileFilter:fileFilter}).single('image'));
 app.use(session({secret:'secret', resave: false, saveUninitialized:false,store:store}));

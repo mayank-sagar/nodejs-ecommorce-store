@@ -4,26 +4,44 @@ const fs = require('fs');
 const path = require('path');
 const PDFDocument = require('pdfkit');
 // const Cart = require('../models/cart');
+const  ITEMS_PER_PAGE = 2;
 
 exports.getProducts = (req,res,next) => {
-    Product.find()
-    .then(products => {
-          return res.render('shop/product-list',{
+    
+    const page = +req.query.page || 1;
+    let totalItems = 0;
+    Product.find().countDocuments().then(numProducts => {
+        totalItems = numProducts;
+        
+        return  Product.find()
+        .skip((page-1) * ITEMS_PER_PAGE)
+        .limit(ITEMS_PER_PAGE)
+    }).then(products => {
+        res.render('shop/product-list',{
             prods:products,
             docTitle:'Products',
             path:'/products',
-            isAuthenticated:req.user
+            isAuthenticated:req.user,
+            currentPage: page,
+            hasNextPage:ITEMS_PER_PAGE * page < totalItems,
+            hasPreviousPage: page > 1,
+            nextPage:page + 1,
+            previousPage:page - 1,
+            lastPage: Math.ceil(totalItems/ITEMS_PER_PAGE)
         });
-    })
-     .catch(err => {
-         const error = new Error(err);
-         error.httpStatusCode = 500;
-         return next(error);
-    });
+    }).catch(err => {
+     const error = new Error(err);
+     error.httpStatusCode = 500;
+     return next(error);
+});;
+
+   
 }
 
 
 exports.getProduct = (req,res,next) => {
+
+    
     const prodId = req.params.productId;
     Product.findById(prodId)
     .then((product) => {
@@ -140,13 +158,27 @@ exports.postOrder = (req,res,next) => {
 };
 
 exports.getIndex = (req,res,next) => {
-        Product.find().then(products => {
+        const page = +req.query.page || 1;
+        let totalItems = 0;
+        Product.find().countDocuments().then(numProducts => {
+            totalItems = numProducts;
+            
+            return  Product.find()
+            .skip((page-1) * ITEMS_PER_PAGE)
+            .limit(ITEMS_PER_PAGE)
+        }).then(products => {
         return res.render('shop/index',{
             prods:products,
             docTitle:'Shop | Home ',
             path:'/',
+            currentPage: page,
+            hasNextPage:ITEMS_PER_PAGE * page < totalItems,
+            hasPreviousPage: page > 1,
+            nextPage:page + 1,
+            previousPage:page - 1,
+            lastPage: Math.ceil(totalItems/ITEMS_PER_PAGE)
         });
-        }) .catch(err => {
+        }).catch(err => {
          const error = new Error(err);
          error.httpStatusCode = 500;
          return next(error);

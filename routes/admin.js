@@ -15,7 +15,6 @@ const {body} = require('express-validator');
     [
         body('title')
         .trim()
-        .isAlphanumeric()
         .isLength({min:3})
         ,
         body('price')
@@ -32,7 +31,6 @@ const {body} = require('express-validator');
     [
         body('title')
         .trim()
-        .isAlphanumeric()
         .isLength({min:3})
         ,
         body('price')

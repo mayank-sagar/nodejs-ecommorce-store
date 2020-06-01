@@ -1,7 +1,7 @@
 const Product = require('../models/product');
 const fileHelper = require('../utils/file');
 const {validationResult} = require('express-validator');
-
+const  ITEMS_PER_PAGE = 2;
 exports.getAddProduct = (req,res,next) => {
     // res.sendFile(path.join(rootDir,'views','add-product.html'));
      res.render('admin/edit-product',
@@ -107,23 +107,40 @@ exports.getEditProduct = (req,res,next) => {
 
 
 exports.getProducts = (req,res,next) => {
-    //req.user.getProducts()
+
+
+    const page = +req.query.page || 1;
+    let totalItems = 0;
     Product.find({userId:req.user._id})
-    // .select('title price -_id')
+      // .select('title price -_id')
     // .populate('userId','name')
-    .then(products => {
-        console.log(products);
-         return res.render('admin/products',{
-                prods:products,
-                docTitle:'Admin Products',
-                path:'/admin/products',
-                isAuthenticated:req.user
+    //req.user.getProducts()
+    .countDocuments().
+    then(numProducts => {
+        totalItems = numProducts;
+        return  Product.find()
+        .skip((page-1) * ITEMS_PER_PAGE)
+        .limit(ITEMS_PER_PAGE)
+    }).then(products => {
+        return res.render('shop/product-list',{
+            prods:products,
+            docTitle:'Admin Products',
+            path:'/admin/products',
+            isAuthenticated:req.user,
+            currentPage: page,
+            hasNextPage:ITEMS_PER_PAGE * page < totalItems,
+            hasPreviousPage: page > 1,
+            nextPage:page + 1,
+            previousPage:page - 1,
+            lastPage: Math.ceil(totalItems/ITEMS_PER_PAGE)
         });
     }).catch(err => {
-        const error = new Error(err);
-        error.httpStatusCode = 500;
-        return next(error);
-   });
+        console.log(err);
+     const error = new Error(err);
+     error.httpStatusCode = 500;
+     return next(error);
+});
+
 };
 
 exports.postEditProduct = (req,res,next) => {

@@ -122,7 +122,7 @@ exports.getProducts = (req,res,next) => {
         .skip((page-1) * ITEMS_PER_PAGE)
         .limit(ITEMS_PER_PAGE)
     }).then(products => {
-        return res.render('shop/product-list',{
+        return res.render('admin/products',{
             prods:products,
             docTitle:'Admin Products',
             path:'/admin/products',
@@ -199,8 +199,8 @@ exports.postEditProduct = (req,res,next) => {
    });
     }
 
-exports.postDeleteProduct = (req,res,next) => {
-    const productId = req.body.productId;
+exports.deleteProduct = (req,res,next) => {
+    const productId = req.params.productId;
     Product.findById(productId).then((product) => {
         if(!product) {
             next(new Error("Product Not Found"));
@@ -211,12 +211,9 @@ exports.postDeleteProduct = (req,res,next) => {
     .then(() => {
         
         console.log("PRODUCT DELETED SUCCESS");
-        return res.redirect('/admin/products');
+        return res.status(200).json({message:"Success!"});
     })
     .catch(err => {
-        const error = new Error(err);
-        console.log(error);
-        error.httpStatusCode = 500;
-        return next(error);
+      return res.status(500).json({message:"Deleting Product Failed"});
    });
 }

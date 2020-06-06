@@ -3,6 +3,7 @@ const Order = require('../models/order');
 const fs = require('fs');
 const path = require('path');
 const PDFDocument = require('pdfkit');
+const stripe = require('stripe')('sk_test_51GqUuDA9Az0eGhUa1GuBXDzaV3tw6K2OFJqQDM6Z9kn7JAYOK0uXZAO8MFmLysarKcmcqMWbzO4vRr5QNHvM0r44006cC4P4Rh');
 // const Cart = require('../models/cart');
 const  ITEMS_PER_PAGE = 2;
 
@@ -210,6 +211,52 @@ exports.getCart = (req,res) => {
 //     });
 //     }
     
+
+
+exports.getCheckout = (req,res,next) => {
+    let products;
+    let total;
+    req.user.
+    populate('cart.items.productId')
+    .execPopulate()
+    .then((user) => {
+        products = user.cart.items;
+        total = 0;
+        products.forEach((p) => {
+            total += p.quantity * p.productId.price;
+        });
+        return stripe.checkout.sessions.create({
+            payment_method_types:['card'],
+            line_items:products.map((p) => {
+                return {
+                    name:p.productId.title,
+                    description:p.productId.description,
+                    amount:p.productId.price  * 100,
+                    currency: 'usd',
+                    quantity: p.quantity,
+                    "address[line1]":"510 Townsend St" ,
+                    "address[postal_code]":98140,
+                    "address[city]":"San Francisco" ,
+                    "address[state]":'CA',
+                    "address[country]":'US'
+                };
+            }),
+            success_url: req.protocol + '://' + req.get('host') + '/checkout/success',
+            cancel_url: req.protocol + '://' + req.get('host') + '/checkout/cancel'
+        });
+    })
+    .then((session) => {
+        return res.render('shop/checkout',{
+            path: '/checkout',
+            docTitle:'Checkout',
+            products:products,
+            isAuthenticated:req.user,
+            totalSum:total,
+            sessionId:session.id
+        });
+    })
+    .catch(err => console.log(err));
+};
 exports.getOrders = (req,res,next) => {
     Order.find({'user.userId':req.user})
     .then(orders => {
@@ -261,3 +308,36 @@ exports.getInvoice = (req,res,next) => {
         pdfDoc.end();
     }).catch(err => next(err));
 }
+
+exports.getCheckoutSuccess = (req,res,next) => {
+    req.user.
+    populate('cart.items.productId')
+    .execPopulate()
+    .then(user => {
+        const products = user.cart.items.map(i => {
+            return {quantity:i.quantity,product: {...i.productId._doc}}
+        });
+        order = new Order({
+            user: {
+                email:req.user.email,
+                userId: req.user
+            },
+            products:products
+        });
+        return order.save()
+    }).then(() => {
+        req.user.clearCart().then( result => {
+            return res.redirect('/orders');
+        })
+        .catch(err => {
+            const error = new Error(err);
+            error.httpStatusCode = 500;
+            return next(error);
+       });
+    })
+     .catch(err => {
+         const error = new Error(err);
+         error.httpStatusCode = 500;
+         return next(error);
+    });
+};

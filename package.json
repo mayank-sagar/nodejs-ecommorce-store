@@ -5,14 +5,14 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app.js"
+    "start": "node init && nodemon app.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "body-parser": "^1.19.0",
+    "body-parser": "^2.3.0",
     "ejs": "^3.0.1",
-    "express": "^4.17.1",
+    "express": "^5.2.1",
     "express-handlebars": "^3.0.2",
     "mysql2": "^2.1.0",
     "pug": "^2.0.4",
